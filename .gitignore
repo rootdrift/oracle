@@ -1,0 +1,43 @@
+# oracle — exclude large datasets and model checkpoints
+# Only documentation (Markdown) is tracked in this repository.
+
+# Datasets (RSI-CB256 and any derived splits)
+datasets/
+data/
+RSI-CB256/
+*.zip
+*.tar
+*.tar.gz
+
+# Model checkpoints and serialised artefacts
+checkpoints/
+*.h5
+*.pkl
+*.pth
+*.pt
+*.ckpt
+*.onnx
+*.npz
+*.npy
+*.joblib
+
+# Notebooks output / runtime
+.ipynb_checkpoints/
+
+# Generated figures (t-SNE / PCA / confusion matrices)
+*.png
+*.jpg
+*.jpeg
+*.pdf
+*.svg
+
+# Python runtime
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS / editor cruft
+.DS_Store
+*.swp
+*~
