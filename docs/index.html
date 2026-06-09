@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<!-- DESIGN RATIONALE:
+     New entry in the design system. Oracle is ML security research — research dashboard aesthetic.
+     Palette: cool indigo/purple (#7c6fff primary, #b08fff secondary) on deep charcoal.
+     Dense data panels for metrics, architecture diagrams as ASCII-style text blocks.
+     Share Tech Mono for all identifiers, metrics, model names, architecture labels.
+     Barlow 300 for body prose — analytical voice, not operational.
+     Scanline overlay retained. Purple-tinted surface for "analytical workspace" feel.
+     Key constraint: TerraCNN = 93.97% / F1 0.9390, ResNet-18 = 99.11% — never swap these.
+     Footer: oracle + 2026-06-10.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORACLE — Applied ML Security Research</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09080f;
+    --surface: #0e0c18;
+    --surface2: #131025;
+    --border: #1e1a2e;
+    --border-bright: #2e2848;
+    --accent: #7c6fff;
+    --accent2: #b08fff;
+    --accent-cyan: #00d4e8;
+    --accent-green: #00e87a;
+    --accent-amber: #e8a800;
+    --text: #bab4d8;
+    --text-bright: #e0daf0;
+    --muted: #4a4468;
+    --code-bg: #060510;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 300;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 3rem 2rem 6rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .sys-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    opacity: 0.85;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: #fff;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+
+  h1 .sep { color: var(--accent); font-weight: 300; margin: 0 0.3em; }
+
+  .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+
+  .corner-tag {
+    position: absolute;
+    top: 0; right: 0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-align: right;
+    line-height: 1.9;
+  }
+  .corner-tag span { display: block; }
+
+  .section-break {
+    display: flex; align-items: center; gap: 1rem; margin: 2.75rem 0 1.4rem;
+  }
+  .section-break span {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .section-break::before, .section-break::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  .info-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 0.9rem 1.25rem;
+    margin: 1rem 0;
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+  .info-block .blk-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--accent);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  /* Metrics scoreboard */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border-bright);
+    border: 1px solid var(--border-bright);
+    margin: 1rem 0;
+  }
+  .metric-cell {
+    background: var(--surface);
+    padding: 1.2rem 1rem;
+    text-align: center;
+  }
+  .metric-value {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.35rem;
+    color: var(--accent2);
+    line-height: 1;
+    display: block;
+  }
+  .metric-value.highlight { color: var(--accent-green); }
+  .metric-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.52rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    display: block;
+  }
+
+  /* Data table */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    margin: 1rem 0;
+  }
+  .data-table th {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.45rem 0.9rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-bright);
+    background: var(--code-bg);
+  }
+  .data-table td {
+    padding: 0.6rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(124,111,255,0.025); }
+  .data-table td:first-child {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent2);
+    letter-spacing: 0.04em;
+  }
+  .data-table td.best { color: var(--accent-green); font-weight: 600; }
+
+  /* Architecture block */
+  .arch-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 1.1rem 1.4rem;
+    margin: 1rem 0;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent2);
+    line-height: 1.75;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  /* Security mapping */
+  .sec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border-bright); margin: 1rem 0; }
+  .sec-cell {
+    background: var(--surface);
+    padding: 0.85rem 1rem;
+    font-size: 0.8rem;
+  }
+  .sec-technique {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent-cyan);
+    letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .sec-cell p { color: var(--muted); line-height: 1.5; font-size: 0.77rem; }
+
+  /* Skills */
+  .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border-bright); margin: 1rem 0; }
+  .skill-cell { background: var(--surface); padding: 0.85rem 1rem; font-size: 0.8rem; }
+  .skill-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .skill-cell p { color: var(--text); line-height: 1.5; }
+
+  footer {
+    margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+    font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--muted);
+    letter-spacing: 0.15em; display: flex; justify-content: space-between; text-transform: uppercase;
+  }
+
+  p { margin-bottom: 0.8rem; }
+  p:last-child { margin-bottom: 0; }
+
+  @media (max-width: 640px) {
+    .metrics-grid { grid-template-columns: 1fr 1fr; }
+    .sec-grid, .skills-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="sys-label">// APPLIED ML SECURITY RESEARCH — PORTFOLIO PROJECT</div>
+    <h1>Oracle<span class="sep">//</span>Classify</h1>
+    <div class="subtitle">RSI-CB256 DATASET · TERRACNN · RESNET-18 · LATENT SPACE ANALYSIS · SECURITY-RELEVANT METHODOLOGY</div>
+    <div class="corner-tag">
+      <span>RESEARCH STATUS — COMPLETE</span>
+      <span>rev 2026-06-10</span>
+    </div>
+  </header>
+
+  <div class="info-block">
+    <span class="blk-label">Research Framing</span>
+    Applied ML security research: land-cover classification from satellite imagery, benchmarked
+    against classical learners. The security relevance is methodological — handling class imbalance,
+    tuning for minority-class recall, inspecting latent feature space, and comparing parametric vs.
+    non-parametric learners are the same techniques used in intrusion detection, malware
+    classification, and anomaly detection pipelines.
+  </div>
+
+  <div class="section-break"><span>Key Results</span></div>
+
+  <div class="metrics-grid">
+    <div class="metric-cell">
+      <span class="metric-value highlight">99.11%</span>
+      <span class="metric-label">ResNet-18 Accuracy</span>
+    </div>
+    <div class="metric-cell">
+      <span class="metric-value">93.97%</span>
+      <span class="metric-label">TerraCNN Accuracy</span>
+    </div>
+    <div class="metric-cell">
+      <span class="metric-value">0.9390</span>
+      <span class="metric-label">TerraCNN F1 Macro</span>
+    </div>
+    <div class="metric-cell">
+      <span class="metric-value">0.6478</span>
+      <span class="metric-label">Latent Space ARI</span>
+    </div>
+  </div>
+
+  <div class="info-block" style="border-left-color: var(--accent-cyan);">
+    <span class="blk-label" style="color:var(--accent-cyan)">Metric Choice</span>
+    Primary evaluation metric is macro-averaged F₁ — equal weight to all four classes regardless
+    of frequency. This mirrors the threat-detection requirement where rare events (attacks) must
+    not be drowned by majority-class accuracy. A model that labels everything benign achieves
+    high accuracy but zero security value.
+  </div>
+
+  <div class="section-break"><span>Dataset — RSI-CB256</span></div>
+
+  <table class="data-table">
+    <tr><th>Class</th><th>Samples</th><th>Characteristics</th></tr>
+    <tr><td>Forest</td><td>1,500</td><td>High saturation variance; green-dominant</td></tr>
+    <tr><td>Water</td><td>1,500</td><td>High brightness; spectrally distinct</td></tr>
+    <tr><td>Cloudy</td><td>1,500</td><td>Low saturation; significant illumination spread</td></tr>
+    <tr><td>Desert</td><td>1,131</td><td>Low saturation; brown-dominant; under-represented</td></tr>
+  </table>
+
+  <p>Total: 5,631 images. Approximately 25% inter-class imbalance (Desert vs. majority classes).
+  HSV saturation means span 0.12 to 0.35 — photometric diversity that rules out simple
+  colour-histogram classifiers. Data split: stratified 70/20/10
+  (train 3,941 / val 1,126 / test 563), identical across all models.</p>
+
+  <div class="section-break"><span>TerraCNN Architecture</span></div>
+
+  <div class="arch-block">Input: 128 × 128 × 3 (RGB, ImageNet-normalised)
+
+Conv Block 1:  32 filters, 3×3 kernel → ReLU → BatchNorm → MaxPool 2×2
+Conv Block 2:  64 filters, 3×3 kernel → ReLU → BatchNorm → MaxPool 2×2
+Conv Block 3: 128 filters, 3×3 kernel → ReLU → BatchNorm → MaxPool 2×2
+
+Global Average Pooling
+
+Dense:    256 units → ReLU → Dropout (p = 0.50)
+Output:     4 units → Softmax
+
+Regularisation: dropout 0.50, L₂ weight decay λ = 1e-4
+Optimiser: Adam β1=0.9, β2=0.999 · LR: 1e-3 → 2.5e-4 by epoch 70
+Imbalance: class-weighted cross-entropy + inverse-frequency sampler</div>
+
+  <p>Augmentation policy was motivated by EDA: HSV means differing by up to 0.23 across classes.
+  A colour-insensitive augmentation (colour jitter brightness=contrast=saturation=0.3 and ±20°
+  rotation) avoids leaking class information through photometric artefacts.</p>
+
+  <div class="section-break"><span>Model Comparison</span></div>
+
+  <table class="data-table">
+    <tr><th>Model</th><th>Architecture</th><th>Test Accuracy</th><th>F₁_macro</th></tr>
+    <tr>
+      <td>ResNet-18 (transfer)</td>
+      <td>Pretrained 18-layer residual CNN, fine-tuned on RSI-CB256</td>
+      <td class="best">99.11%</td>
+      <td class="best">0.9916</td>
+    </tr>
+    <tr>
+      <td>TerraCNN (scratch)</td>
+      <td>Custom 3-stage CNN (32→64→128 filters) + GAP + 256-unit dense</td>
+      <td>93.97%</td>
+      <td>0.9390</td>
+    </tr>
+    <tr>
+      <td>Random Forest</td>
+      <td>100-tree ensemble, class-balanced, 49,152-D pixel vectors</td>
+      <td>—</td>
+      <td>~0.94</td>
+    </tr>
+    <tr>
+      <td>SVM (RBF)</td>
+      <td>RBF-kernel SVM, 49,152-D pixel vectors, grid search C×γ</td>
+      <td>—</td>
+      <td>~0.90</td>
+    </tr>
+  </table>
+
+  <p>ResNet-18 confirms ImageNet-pretrained spatial features transfer effectively to constrained
+  four-class remote-sensing tasks. TerraCNN reaches 0.9390 F₁_macro from scratch — within a
+  point of the Random Forest baseline (~0.94) and roughly five points behind the pretrained
+  network, the expected gap for a small custom network trained on ~3,900 images without pretraining.</p>
+
+  <p>All models struggle most with Water–Forest confusion (spectral overlap in low-illumination
+  scenes). ResNet-18 reduces this to 3.6% error through learned spatial context;
+  SVM reaches 17.4%, demonstrating the limitation of raw pixel vectors.</p>
+
+  <div class="section-break"><span>Latent Space Analysis</span></div>
+
+  <p>Penultimate layer activations (128-dimensional) extracted from TerraCNN on the test split.
+  PCA reduced to 200 components (retaining 96.0% of variance) followed by t-SNE (perplexity=30)
+  for two-dimensional projection.</p>
+
+  <p><strong style="color:var(--accent2)">ARI = 0.6478</strong> — strong agreement between TerraCNN's
+  internal cluster structure and true class labels. Four coherent clusters emerge in the projection,
+  with residual Water–Cloudy overlap accounting for the gap from a theoretical maximum of 1.0.
+  This confirms the CNN is learning genuine discriminative features, not spurious correlations.</p>
+
+  <div class="section-break"><span>Security Relevance</span></div>
+
+  <div class="sec-grid">
+    <div class="sec-cell">
+      <span class="sec-technique">Macro F₁ primary metric</span>
+      <p>Rare-class recall — attacks are the minority class in any production IDS. High accuracy by labelling everything benign is not acceptable.</p>
+    </div>
+    <div class="sec-cell">
+      <span class="sec-technique">Class-weighted loss + inverse-frequency sampler</span>
+      <p>Prevents benign-class dominance in intrusion detection. Standard practice in applied threat detection pipelines.</p>
+    </div>
+    <div class="sec-cell">
+      <span class="sec-technique">SVM with RBF kernel</span>
+      <p>Classical anomaly scoring; used in network intrusion detection benchmarks (NSL-KDD, CICIDS).</p>
+    </div>
+    <div class="sec-cell">
+      <span class="sec-technique">Random Forest</span>
+      <p>Feature importance ranking in malware classification; explainability for SOC analysts reviewing flagged samples.</p>
+    </div>
+    <div class="sec-cell">
+      <span class="sec-technique">CNN spatial feature extraction</span>
+      <p>Network traffic image encoding; binary visualisation for malware classification at scale.</p>
+    </div>
+    <div class="sec-cell">
+      <span class="sec-technique">Latent space ARI analysis</span>
+      <p>Cluster validation in unsupervised threat grouping — verifying the model learns real structure.</p>
+    </div>
+  </div>
+
+  <div class="section-break"><span>Skills Demonstrated</span></div>
+
+  <div class="skills-grid">
+    <div class="skill-cell">
+      <span class="skill-label">Deep Learning</span>
+      <p>Custom CNN architecture design; PyTorch training pipeline; Adam with scheduling; early stopping.</p>
+    </div>
+    <div class="skill-cell">
+      <span class="skill-label">Classical ML</span>
+      <p>SVM grid search; Random Forest with OOB validation; five-fold cross-validation; scikit-learn.</p>
+    </div>
+    <div class="skill-cell">
+      <span class="skill-label">Imbalance Handling</span>
+      <p>Class-weighted cross-entropy; inverse-frequency mini-batch sampling; EDA-driven augmentation design.</p>
+    </div>
+    <div class="skill-cell">
+      <span class="skill-label">Evaluation Methodology</span>
+      <p>Macro F₁; stratified splits identical across all models; controlled comparability; fixed seeds.</p>
+    </div>
+    <div class="skill-cell">
+      <span class="skill-label">Latent Space Analysis</span>
+      <p>PCA (200 components, 96% variance); t-SNE projection; Adjusted Rand Index for cluster validation.</p>
+    </div>
+    <div class="skill-cell">
+      <span class="skill-label">Security-Relevant Framing</span>
+      <p>Imbalance techniques directly applicable to IDS and malware classification pipelines.</p>
+    </div>
+  </div>
+
+  <div class="section-break"><span>Repository</span></div>
+
+  <div class="info-block">
+    <span class="blk-label">GitHub</span>
+    Full methodology, dataset description, architecture documentation, and research references:
+    <span style="font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--accent)">github.com/rootdrift/oracle</span>
+  </div>
+
+  <footer>
+    <span>oracle — applied ml security research</span>
+    <span>rev 2026-06-10</span>
+  </footer>
+
+</div>
+</body>
+</html>
