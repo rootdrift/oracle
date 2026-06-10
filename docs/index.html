@@ -287,12 +287,15 @@
   </header>
 
   <div class="info-block">
-    <span class="blk-label">Research Framing</span>
-    Applied ML security research: land-cover classification from satellite imagery, benchmarked
-    against classical learners. The security relevance is methodological — handling class imbalance,
-    tuning for minority-class recall, inspecting latent feature space, and comparing parametric vs.
-    non-parametric learners are the same techniques used in intrusion detection, malware
-    classification, and anomaly detection pipelines.
+    <span class="blk-label">Why this is in a security portfolio</span>
+    The imagery is satellite land-cover; the transferable asset is the detection methodology.
+    Engineering for class imbalance, optimising for minority-class recall, validating that a model
+    learns genuine structure rather than spurious correlation, and weighing deep against classical
+    learners under identical splits are exactly the disciplines that govern intrusion detection,
+    malware classification, and anomaly detection. A production IDS where 0.01% of traffic is
+    malicious must not score 99.99% accuracy by calling everything benign — the imbalance problem
+    solved here is the imbalance problem in the SOC. The dataset is the vehicle; the method is
+    the point.
   </div>
 
   <div class="section-break"><span>Key Results</span></div>
@@ -474,10 +477,12 @@ Imbalance: class-weighted cross-entropy + inverse-frequency sampler</div>
     <span class="blk-label">GitHub</span>
     Full methodology, dataset description, architecture documentation, and research references:
     <span style="font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--accent)">github.com/rootdrifter/oracle</span>
+    — one repository in the <span style="font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--accent)">github.com/rootdrifter</span> portfolio.
   </div>
 
   <footer>
     <span>oracle — applied ml security research</span>
+    <span>rootdrifter · security-cleared</span>
     <span>rev 2026-06-10</span>
   </footer>
 
