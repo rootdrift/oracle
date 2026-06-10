@@ -352,7 +352,13 @@
   p { margin-bottom: 0.8rem; }
   p:last-child { margin-bottom: 0; }
 
+  /* Mobile: tables scroll horizontally instead of breaking layout */
+  .table-scroll { overflow-x: auto; margin: 1rem 0; }
+  .table-scroll > table { margin: 0; min-width: 520px; }
+
   @media (max-width: 640px) {
+    .corner-tag { position: static; text-align: left; margin-bottom: 1rem; line-height: 1.7; }
+    .corner-tag span { display: inline-block; margin-right: 1.2rem; }
     .metrics-grid { grid-template-columns: 1fr 1fr; }
     .sec-grid, .skills-grid { grid-template-columns: 1fr; }
     footer { flex-direction: column; gap: 0.5rem; }
@@ -426,6 +432,11 @@
   .footer-nav a { color: var(--muted); text-decoration: none; }
   .footer-nav a:hover { color: var(--accent); }
   .footer-nav .fsep { color: var(--border-bright); }
+
+  @media (max-width: 420px) {
+    h1 { font-size: 1.8rem; }
+    .container { padding-left: 1.25rem; padding-right: 1.25rem; }
+  }
 </style>
 </head>
 <body>
@@ -497,13 +508,13 @@
 
   <div class="section-break"><span>Dataset — RSI-CB256</span></div>
 
-  <table class="data-table">
+  <div class="table-scroll"><table class="data-table">
     <tr><th>Class</th><th>Samples</th><th>Characteristics</th></tr>
     <tr><td>Forest</td><td>1,500</td><td>High saturation variance; green-dominant</td></tr>
     <tr><td>Water</td><td>1,500</td><td>High brightness; spectrally distinct</td></tr>
     <tr><td>Cloudy</td><td>1,500</td><td>Low saturation; significant illumination spread</td></tr>
     <tr><td>Desert</td><td>1,131</td><td>Low saturation; brown-dominant; under-represented</td></tr>
-  </table>
+  </table></div>
 
   <p>Total: 5,631 images. Approximately 25% inter-class imbalance (Desert vs. majority classes).
   HSV saturation means span 0.12 to 0.35 — photometric diversity that rules out simple
@@ -546,7 +557,7 @@ Imbalance: class-weighted cross-entropy + inverse-frequency sampler</div>
   </div>
 
 
-  <table class="data-table">
+  <div class="table-scroll"><table class="data-table">
     <tr><th>Model</th><th>Architecture</th><th>Test Accuracy</th><th>F₁_macro</th></tr>
     <tr>
       <td>ResNet-18 (transfer)</td>
@@ -572,7 +583,7 @@ Imbalance: class-weighted cross-entropy + inverse-frequency sampler</div>
       <td>—</td>
       <td>~0.90</td>
     </tr>
-  </table>
+  </table></div>
 
   <p>ResNet-18 confirms ImageNet-pretrained spatial features transfer effectively to constrained
   four-class remote-sensing tasks. TerraCNN reaches 0.9390 F₁_macro from scratch — within a
