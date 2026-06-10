@@ -207,3 +207,7 @@ class-weighted loss address this directly, and are standard practice in applied 
 | Security-relevant framing | Imbalance techniques directly applicable to IDS and malware classification |
 | Python / ML tooling | PyTorch, torchvision, scikit-learn, NumPy, PCA, t-SNE |
 | Reproducibility | Fixed seeds; stratified splits shared across all models; documented hyperparameters |
+
+---
+
+*Part of the [rootdrifter](https://github.com/rootdrifter) security portfolio — built and maintained by a security-cleared candidate. UK-issued clearance held now, not pending vetting: deployable to cleared work from day one.*
